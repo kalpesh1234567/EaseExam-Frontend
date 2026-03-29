@@ -12,6 +12,8 @@ import CreateExam from './pages/CreateExam';
 import ExamResults from './pages/ExamResults';
 import SubmitSheet from './pages/SubmitSheet';
 import MyResult from './pages/MyResult';
+import CreateClassroom from './pages/CreateClassroom';
+import ViewClassroom from './pages/ViewClassroom';
 
 function PrivateRoute({ children, role }) {
   const { isAuthenticated, user } = useAuth();
@@ -47,7 +49,11 @@ export default function App() {
         {/* Teacher Routes */}
         <Route path="/teacher-dashboard" element={<PrivateRoute role="teacher"><TeacherDashboard /></PrivateRoute>} />
         <Route path="/create-exam" element={<PrivateRoute role="teacher"><CreateExam /></PrivateRoute>} />
+        <Route path="/create-classroom" element={<PrivateRoute role="teacher"><CreateClassroom /></PrivateRoute>} />
         <Route path="/exam-results/:examId" element={<PrivateRoute role="teacher"><ExamResults /></PrivateRoute>} />
+        
+        {/* General Protected Routes */}
+        <Route path="/classroom/:id" element={<PrivateRoute><ViewClassroom /></PrivateRoute>} />
         
         {/* Student Routes */}
         <Route path="/student-dashboard" element={<PrivateRoute role="student"><StudentDashboard /></PrivateRoute>} />

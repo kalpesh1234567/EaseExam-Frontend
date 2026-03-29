@@ -12,13 +12,19 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    const { response } = err;
+    if (response && response.status === 401) {
+      // Only logout if we actually have a token but it's rejected by the server
+      const token = localStorage.getItem('token');
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login?expired=true';
+      }
     }
     return Promise.reject(err);
   }
+
 );
 
 export default api;

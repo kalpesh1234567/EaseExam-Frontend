@@ -12,6 +12,12 @@ export default function Navbar() {
     <nav className="navbar">
       <Link to="/dashboard" className="navbar-brand">EasyExam</Link>
       {user && (
+        <div style={{ marginLeft:20, display:'flex', gap:15 }}>
+          <Link to="/dashboard" style={{ color:'var(--text-1)', textDecoration:'none', fontSize:'.9rem', fontWeight:500 }}>Dashboard</Link>
+        </div>
+      )}
+      {user && (
+
         <div className="navbar-actions">
           <span className="navbar-user">
             {user.firstName} {user.lastName}
