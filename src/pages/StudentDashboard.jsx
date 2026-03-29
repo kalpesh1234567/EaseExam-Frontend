@@ -43,12 +43,11 @@ export default function StudentDashboard() {
       fetchDashboard();
     } catch (err) {
       setMessage(err.response?.data?.message || 'Failed to join');
-    } finally {
-      setJoining(false);
     }
   };
- bitumen
+
   return (
+
     <>
       <Navbar />
       <div className="page">
