@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
@@ -7,9 +7,16 @@ export default function CreateExam() {
   const [form, setForm] = useState({ title: '', subject: '', maxMarks: 100, description: '' });
   const [questions, setQuestions] = useState([{ questionNo: 1, text: '', modelAnswer: '', maxMarks: 10 }]);
   const [file, setFile] = useState(null);
+  const [classrooms, setClassrooms] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/classrooms')
+      .then(res => setClassrooms(res.data))
+      .catch(err => setError('Failed to load classrooms. Please create one first.'));
+  }, []);
 
   const handleAddQuestion = () => {
     setQuestions([...questions, { questionNo: questions.length + 1, text: '', modelAnswer: '', maxMarks: 10 }]);
@@ -27,7 +34,7 @@ export default function CreateExam() {
 
     try {
       // 1. Create Exam
-      const { data: exam } = await api.post('/exams', form);
+      const { data: exam } = await api.post('/exams', { ...form, classroomId: form.classroomId });
 
       // 2. Upload Answer Key
       const formData = new FormData();
@@ -70,6 +77,19 @@ export default function CreateExam() {
                   <label>Subject</label>
                   <input type="text" placeholder="e.g. Data Structures" value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} required />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>Select Classroom</label>
+                <select 
+                  value={form.classroomId} 
+                  onChange={e => setForm({...form, classroomId: e.target.value})} 
+                  required
+                >
+                  <option value="">-- Select a Classroom --</option>
+                  {classrooms.map(c => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Total Max Marks</label>

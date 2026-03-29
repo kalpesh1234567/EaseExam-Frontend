@@ -57,7 +57,9 @@ export default function TeacherDashboard() {
                   <div className="card-header">
                     <div>
                       <div className="card-title">{exam.title}</div>
-                      <div className="card-meta">{exam.subject}</div>
+                      <div className="card-meta">
+                        {exam.subject} {exam.classroom?.name && <span style={{color:'var(--primary-color)'}}> • {exam.classroom.name}</span>}
+                      </div>
                     </div>
                   </div>
                   <div style={{ marginTop:8, fontSize:'.85rem', color:'var(--text-2)', display:'flex', justifyContent:'space-between' }}>

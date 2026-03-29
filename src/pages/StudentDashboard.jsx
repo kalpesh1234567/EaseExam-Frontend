@@ -51,7 +51,9 @@ export default function StudentDashboard() {
                   <div className="card-header">
                     <div>
                       <div className="card-title">{exam.title}</div>
-                      <div className="card-meta">{exam.subject} • Prof. {exam.teacher?.lastName}</div>
+                      <div className="card-meta">
+                        {exam.subject} • {exam.classroom?.name && <span style={{color:'var(--primary-color)'}}>{exam.classroom.name} • </span>} Prof. {exam.teacher?.lastName}
+                      </div>
                     </div>
                   </div>
                   <div style={{ marginTop:12, fontSize:'.85rem', color:'var(--text-2)' }}>
