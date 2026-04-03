@@ -20,8 +20,8 @@ export default function MyResult() {
         navigate(`/submit-sheet/${examId}`);
       } else {
         setError('Failed to load result');
-        setLoading(false);
       }
+      setLoading(false);
     });
   }, [examId, navigate]);
 
