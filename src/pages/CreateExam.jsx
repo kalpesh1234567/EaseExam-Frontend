@@ -204,8 +204,9 @@ export default function CreateExam() {
                     <input type="text" placeholder="..." value={q.text} onChange={e => handleQuestionChange(i, 'text', e.target.value)} />
                   </div>
                   <div className="form-group">
-                    <label>Model Answer / Key Points</label>
-                    <textarea placeholder="Describe what a perfect answer contains..." value={q.modelAnswer} onChange={e => handleQuestionChange(i, 'modelAnswer', e.target.value)} required style={{ minHeight: 70 }} />
+                    <label>Model Answer / Key Points <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>(Optional if PDF uploaded)</span></label>
+                    <textarea placeholder="Describe what a perfect answer contains..." value={q.modelAnswer} onChange={e => handleQuestionChange(i, 'modelAnswer', e.target.value)} style={{ minHeight: 70 }} />
+                    <div className="form-hint" style={{ fontSize: '.7rem', marginTop: 4 }}>Required for AI evaluation. If left blank, we'll try extracting from the PDF above.</div>
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label>Max Marks</label>
