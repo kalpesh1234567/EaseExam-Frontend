@@ -3,6 +3,38 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
+function PasswordInput({ id, value, onChange, placeholder, required = true, minLength }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        id={id}
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        minLength={minLength}
+        style={{ paddingRight: 44, width: '100%', boxSizing: 'border-box' }}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={() => setShow(s => !s)}
+        style={{
+          position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          color: 'var(--text-3)', fontSize: '1.1rem', display: 'flex', alignItems: 'center',
+          lineHeight: 1
+        }}
+        aria-label={show ? 'Hide password' : 'Show password'}
+      >
+        {show ? '🙈' : '👁️'}
+      </button>
+    </div>
+  );
+}
+
 export default function Signup() {
   const [searchParams] = useSearchParams();
   const [role, setRole] = useState(searchParams.get('role') || 'student');
@@ -59,7 +91,13 @@ export default function Signup() {
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input id="password" type="password" placeholder="Min 6 characters" {...f('password')} minLength={6} />
+            <PasswordInput
+              id="password"
+              value={form.password}
+              onChange={e => setForm({...form, password: e.target.value})}
+              placeholder="Min 6 characters"
+              minLength={6}
+            />
           </div>
           <button id="signup-submit" type="submit" className="btn btn-primary" style={{ width:'100%', justifyContent:'center' }} disabled={loading}>
             {loading ? 'Creating account…' : `Create ${role === 'teacher' ? 'Teacher' : 'Student'} Account`}

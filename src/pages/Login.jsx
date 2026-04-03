@@ -3,6 +3,37 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
+function PasswordInput({ id, value, onChange, placeholder, required = true }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        id={id}
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        style={{ paddingRight: 44, width: '100%', boxSizing: 'border-box' }}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={() => setShow(s => !s)}
+        style={{
+          position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          color: 'var(--text-3)', fontSize: '1.1rem', display: 'flex', alignItems: 'center',
+          lineHeight: 1
+        }}
+        aria-label={show ? 'Hide password' : 'Show password'}
+      >
+        {show ? '🙈' : '👁️'}
+      </button>
+    </div>
+  );
+}
+
 export default function Login() {
   const [searchParams] = useSearchParams();
   const [role, setRole] = useState(searchParams.get('role') || 'student');
@@ -47,7 +78,12 @@ export default function Login() {
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input id="login-password" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder="Enter password" required />
+            <PasswordInput
+              id="login-password"
+              value={form.password}
+              onChange={e => setForm({...form, password: e.target.value})}
+              placeholder="Enter password"
+            />
           </div>
           <div style={{ textAlign:'right', marginTop:-8, marginBottom:16 }}>
             <Link to="/forgot-password" style={{ fontSize:'.85rem', color:'var(--text-3)' }}>Forgot Password?</Link>

@@ -3,6 +3,39 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
+function PasswordInput({ id, value, onChange, placeholder, required = true, minLength }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        id={id}
+        type={show ? 'text' : 'password'}
+        className="input"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        minLength={minLength}
+        style={{ paddingRight: 44, width: '100%', boxSizing: 'border-box' }}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={() => setShow(s => !s)}
+        style={{
+          position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          color: 'var(--text-3)', fontSize: '1.1rem', display: 'flex', alignItems: 'center',
+          lineHeight: 1
+        }}
+        aria-label={show ? 'Hide password' : 'Show password'}
+      >
+        {show ? '🙈' : '👁️'}
+      </button>
+    </div>
+  );
+}
+
 export default function ResetPassword() {
   const { token } = useParams();
   const { login } = useAuth();
@@ -22,7 +55,6 @@ export default function ResetPassword() {
 
     try {
       const { data } = await api.put(`/auth/resetpassword/${token}`, { password });
-      // Log the user in with the newly returned token
       login(data.user, data.token);
       setSuccess(true);
     } catch (err) {
@@ -62,32 +94,28 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
           <div className="form-group">
             <label>New Password</label>
-            <input 
-              type="password" 
-              className="input" 
-              required 
-              minLength="6"
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
+            <PasswordInput
+              id="new-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
+              minLength="6"
             />
           </div>
           
           <div className="form-group">
             <label>Confirm Password</label>
-            <input 
-              type="password" 
-              className="input" 
-              required 
-              minLength="6"
-              value={confirmPassword} 
-              onChange={e => setConfirmPassword(e.target.value)} 
+            <PasswordInput
+              id="confirm-password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
+              minLength="6"
             />
           </div>
           
           <button type="submit" className="btn btn-primary" style={{ marginTop:8 }} disabled={loading}>
-            {loading ? 'Saving...' : 'Set Password Component'}
+            {loading ? 'Saving...' : 'Set New Password'}
           </button>
         </form>
       </div>
