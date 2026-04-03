@@ -144,7 +144,9 @@ export default function SubmitSheet() {
       stopCamera();
       navigate(`/my-result/${examId}`);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Upload failed');
+      const serverMsg = err.response?.data?.message;
+      const serverDetails = err.response?.data?.details;
+      setError(serverDetails ? `${serverMsg} (${serverDetails})` : (serverMsg || err.message || 'Upload failed'));
       setUploading(false);
     }
   };
