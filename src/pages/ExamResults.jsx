@@ -234,7 +234,7 @@ export default function ExamResults() {
                           <td style={{ padding:'14px 24px' }}>
                             {fileUrl ? (
                               <a
-                                href={`${SERVER}${fileUrl}`}
+                                href={fileUrl.startsWith('http') ? fileUrl : `${SERVER}${fileUrl}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ color:'var(--accent)', textDecoration:'underline', fontSize:'.85rem' }}

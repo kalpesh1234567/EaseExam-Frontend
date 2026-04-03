@@ -180,7 +180,7 @@ export default function SubmitSheet() {
           {/* Question paper download banner */}
           {exam.questionPaperUrl && (
             <a
-              href={`${SERVER}${exam.questionPaperUrl}`}
+              href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

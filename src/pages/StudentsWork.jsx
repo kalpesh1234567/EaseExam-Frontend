@@ -120,7 +120,7 @@ export default function StudentsWork() {
                       <td style={{ padding: '16px 24px' }}>
                         {item.hasSubmitted ? (
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <a href={`${SERVER}${item.fileUrl}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
+                            <a href={item.fileUrl.startsWith('http') ? item.fileUrl : `${SERVER}${item.fileUrl}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
                               View Sheet
                             </a>
                             {item.status === 'evaluated' && (

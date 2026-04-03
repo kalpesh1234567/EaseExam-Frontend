@@ -123,7 +123,7 @@ export default function StudentDashboard() {
                       <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                         {exam.questionPaperUrl && (
                           <a
-                            href={`${SERVER}${exam.questionPaperUrl}`}
+                            href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-ghost btn-sm"

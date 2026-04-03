@@ -137,7 +137,7 @@ export default function TeacherDashboard() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid var(--border)', flexWrap: 'wrap' }}>
                         {exam.questionPaperUrl ? (
                           <a
-                            href={`${SERVER}${exam.questionPaperUrl}`}
+                            href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ fontSize: '.78rem', color: 'var(--primary-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
