@@ -4,6 +4,8 @@ import Navbar from '../components/Navbar';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
+const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+
 export default function StudentDashboard() {
   const { user } = useAuth();
   const [exams, setExams] = useState([]);
@@ -115,11 +117,22 @@ export default function StudentDashboard() {
                           </div>
                         </div>
                       </div>
-                      <div style={{ marginTop:12, fontSize:'.85rem', color:'var(--text-2)' }}>
-                        Max Marks: <b style={{color:'var(--accent-2)'}}>{exam.maxMarks}</b>
+                      <div style={{ marginTop: 12, fontSize: '.85rem', color: 'var(--text-2)' }}>
+                        Max Marks: <b style={{ color: 'var(--accent-2)' }}>{exam.maxMarks}</b>
                       </div>
-                      <div style={{ marginTop:16, display:'flex', gap:10 }}>
-                        <Link to={`/my-result/${exam._id}`} className="btn btn-primary btn-sm" style={{ flex:1, justifyContent:'center' }}>
+                      <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                        {exam.questionPaperUrl && (
+                          <a
+                            href={`${SERVER}${exam.questionPaperUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-ghost btn-sm"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)' }}
+                          >
+                            📄 Question Paper
+                          </a>
+                        )}
+                        <Link to={`/my-result/${exam._id}`} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: 'center' }}>
                           Upload Answer Sheet / View Result →
                         </Link>
                       </div>
