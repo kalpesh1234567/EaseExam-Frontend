@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
 
 // Convert dataURL → File object
 function dataURLtoFile(dataUrl, filename) {

@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
