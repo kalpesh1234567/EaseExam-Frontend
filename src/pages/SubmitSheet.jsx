@@ -182,7 +182,7 @@ export default function SubmitSheet() {
           {/* Question paper download banner */}
           {exam.questionPaperUrl && (
             <a
-              href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl}`}
+              href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl.startsWith('/') ? '' : '/'}${exam.questionPaperUrl.replace(/\\/g, '/')}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

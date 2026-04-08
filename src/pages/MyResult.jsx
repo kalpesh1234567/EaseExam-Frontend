@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
+const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
+
 export default function MyResult() {
   const { examId } = useParams();
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function MyResult() {
   if (loading) return <><Navbar /><div className="spinner-wrap"><div className="spinner"/></div></>;
   if (error) return <><Navbar /><div className="container" style={{paddingTop:40}}><div className="alert alert-error">{error}</div></div></>;
 
-  const { status, errorMsg, exam, evaluation, questionScores } = data;
+  const { status, errorMsg, exam, evaluation, questionScores, fileUrl } = data;
 
   if (status === 'pending') {
     return (
@@ -58,9 +60,33 @@ export default function MyResult() {
       <Navbar />
       <div className="page">
         <div className="container" style={{ maxWidth:800 }}>
-          <div className="page-header" style={{ textAlign:'center' }}>
+          <div className="page-header" style={{ textAlign:'center', position: 'relative' }}>
             <h2 className="page-title" style={{ fontSize:'2.2rem' }}>{exam.title} Output</h2>
             <p className="page-subtitle">{exam.subject}</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24, flexWrap: 'wrap' }}>
+              {exam.questionPaperUrl && (
+                <a
+                  href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl.startsWith('/') ? '' : '/'}${exam.questionPaperUrl.replace(/\\/g, '/')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: 8, padding: '8px 16px' }}
+                >
+                  📄 View Question Paper
+                </a>
+              )}
+              {fileUrl && (
+                <a
+                  href={fileUrl.startsWith('http') ? fileUrl : `${SERVER}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl.replace(/\\/g, '/')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--green)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 8, padding: '8px 16px' }}
+                >
+                  📝 View My Answer Sheet
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="card" style={{ display:'flex', alignItems:'center', justifyContent:'space-around', padding:'32px 24px', marginBottom:32, background:'linear-gradient(145deg, rgba(20,24,36,0.8), rgba(10,13,20,0.9))' }}>
