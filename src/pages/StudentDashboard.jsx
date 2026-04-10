@@ -3,15 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
-
-/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
-const getPdfViewerUrl = (url) => {
-  if (!url) return '';
-  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
-};
+import { openPdf } from '../utils/openPdf';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -21,6 +13,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [message, setMessage] = useState('');
+  const [pdfLoading, setPdfLoading] = useState({});
 
   const fetchDashboard = async () => {
     try {
@@ -129,15 +122,14 @@ export default function StudentDashboard() {
                       </div>
                       <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                         {exam.questionPaperUrl && (
-                          <a
-                            href={getPdfViewerUrl(exam.questionPaperUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => openPdf(`/files/question-paper/${exam._id}`, (v) => setPdfLoading(p => ({ ...p, [exam._id]: v })))}
+                            disabled={pdfLoading[exam._id]}
                             className="btn btn-ghost btn-sm"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)' }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)', cursor: 'pointer', background: 'transparent' }}
                           >
-                            📄 Question Paper
-                          </a>
+                            {pdfLoading[exam._id] ? '⏳ Loading...' : '📄 Question Paper'}
+                          </button>
                         )}
                         <Link to={`/my-result/${exam._id}`} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: 'center' }}>
                           Upload Answer Sheet / View Result →

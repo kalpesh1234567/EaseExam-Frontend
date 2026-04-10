@@ -2,21 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
-
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
-
-/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
-const getPdfViewerUrl = (url) => {
-  if (!url) return '';
-  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
-};
+import { openPdf } from '../utils/openPdf';
 
 export default function StudentsWork() {
   const { examId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pdfLoading, setPdfLoading] = useState({});
 
   useEffect(() => {
     api.get(`/exams/${examId}/submissions-status`)
@@ -127,9 +120,14 @@ export default function StudentsWork() {
                       <td style={{ padding: '16px 24px' }}>
                         {item.hasSubmitted ? (
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <a href={getPdfViewerUrl(item.fileUrl)} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
-                              View Sheet
-                            </a>
+                            <button
+                              onClick={() => openPdf(`/files/answer-sheet/${item.submissionId}`, (v) => setPdfLoading(p => ({ ...p, [item.submissionId]: v })))}
+                              disabled={pdfLoading[item.submissionId]}
+                              className="btn btn-ghost btn-sm"
+                              style={{ padding: '4px 8px', fontSize: '.75rem', cursor: 'pointer', background: 'transparent' }}
+                            >
+                              {pdfLoading[item.submissionId] ? '⏳ Loading...' : 'View Sheet'}
+                            </button>
                             {item.status === 'evaluated' && (
                               <Link to={`/exam-results/${examId}`} className="btn btn-primary btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
                                 View Result

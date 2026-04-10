@@ -3,15 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
-
-/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
-const getPdfViewerUrl = (url) => {
-  if (!url) return '';
-  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
-};
+import { openPdf } from '../utils/openPdf';
 
 export default function TeacherDashboard() {
   const { user } = useAuth();
@@ -19,6 +11,7 @@ export default function TeacherDashboard() {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploadStatus, setUploadStatus] = useState({}); // examId → 'uploading' | 'done' | 'error'
+  const [pdfLoading, setPdfLoading] = useState({});
   const fileInputRefs = useRef({});
 
   useEffect(() => {
@@ -143,14 +136,13 @@ export default function TeacherDashboard() {
                       {/* Question Paper upload strip */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid var(--border)', flexWrap: 'wrap' }}>
                         {exam.questionPaperUrl ? (
-                          <a
-                            href={getPdfViewerUrl(exam.questionPaperUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ fontSize: '.78rem', color: 'var(--primary-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
+                          <button
+                            onClick={() => openPdf(`/files/question-paper/${exam._id}`, (v) => setPdfLoading(p => ({ ...p, [exam._id]: v })))}
+                            disabled={pdfLoading[exam._id]}
+                            style={{ fontSize: '.78rem', color: 'var(--primary-color)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: 0 }}
                           >
-                            📄 Question Paper ↗
-                          </a>
+                            {pdfLoading[exam._id] ? '⏳ Loading...' : '📄 Question Paper ↗'}
+                          </button>
                         ) : (
                           <span style={{ fontSize: '.78rem', color: 'var(--text-3)' }}>📄 No question paper yet</span>
                         )}

@@ -2,15 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
-
-const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
-
-/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
-const getPdfViewerUrl = (url) => {
-  if (!url) return '';
-  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
-};
+import { openPdf } from '../utils/openPdf';
 
 export default function MyResult() {
   const { examId } = useParams();
@@ -18,6 +10,7 @@ export default function MyResult() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pdfLoading, setPdfLoading] = useState({});
 
   useEffect(() => {
     api.get(`/results/student/${examId}`).then(r => {
@@ -37,7 +30,7 @@ export default function MyResult() {
   if (loading) return <><Navbar /><div className="spinner-wrap"><div className="spinner"/></div></>;
   if (error) return <><Navbar /><div className="container" style={{paddingTop:40}}><div className="alert alert-error">{error}</div></div></>;
 
-  const { status, errorMsg, exam, evaluation, questionScores, fileUrl } = data;
+  const { status, errorMsg, exam, evaluation, questionScores, fileUrl, submissionId } = data;
 
   if (status === 'pending') {
     return (
@@ -72,26 +65,24 @@ export default function MyResult() {
             <p className="page-subtitle">{exam.subject}</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24, flexWrap: 'wrap' }}>
               {exam.questionPaperUrl && (
-                <a
-                  href={getPdfViewerUrl(exam.questionPaperUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => openPdf(`/files/question-paper/${examId}`, (v) => setPdfLoading(p => ({ ...p, qp: v })))}
+                  disabled={pdfLoading.qp}
                   className="btn btn-ghost btn-sm"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: 8, padding: '8px 16px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--primary-color)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', background: 'transparent' }}
                 >
-                  📄 View Question Paper
-                </a>
+                  {pdfLoading.qp ? '⏳ Loading...' : '📄 View Question Paper'}
+                </button>
               )}
               {fileUrl && (
-                <a
-                  href={getPdfViewerUrl(fileUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => openPdf(`/files/answer-sheet/${submissionId}`, (v) => setPdfLoading(p => ({ ...p, sheet: v })))}
+                  disabled={pdfLoading.sheet || !submissionId}
                   className="btn btn-ghost btn-sm"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none', color: 'var(--green)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 8, padding: '8px 16px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--green)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', background: 'transparent' }}
                 >
-                  📝 View My Answer Sheet
-                </a>
+                  {pdfLoading.sheet ? '⏳ Loading...' : '📝 View My Answer Sheet'}
+                </button>
               )}
             </div>
           </div>

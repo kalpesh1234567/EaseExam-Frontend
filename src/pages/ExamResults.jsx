@@ -2,15 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
+import { openPdf } from '../utils/openPdf';
 
-const SERVER = 'https://easeexam-backend.onrender.com';
-
-/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
-const getPdfViewerUrl = (url) => {
-  if (!url) return '';
-  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
-};
 
 const STATUS_CONFIG = {
   not_submitted: { bg: 'rgba(107,114,128,0.12)', color: '#9ca3af', label: 'NOT SUBMITTED' },
@@ -40,7 +33,8 @@ export default function ExamResults() {
   const [stats, setStats]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
-  const [filter, setFilter]   = useState('all');       // 'all' | 'submitted' | 'not_submitted'
+  const [filter, setFilter]   = useState('all');
+  const [pdfLoading, setPdfLoading] = useState({});
 
   useEffect(() => {
     Promise.all([
@@ -54,7 +48,7 @@ export default function ExamResults() {
       // Build a map of studentId → evaluation data from results endpoint
       const map = {};
       for (const r of resRes.data) {
-        map[r.student._id] = { fileUrl: r.fileUrl, evaluation: r.evaluation };
+        map[r.student._id] = { submissionId: r.submissionId, fileUrl: r.fileUrl, evaluation: r.evaluation };
       }
       setEvalMap(map);
       setStats(statRes.data);
@@ -68,8 +62,24 @@ export default function ExamResults() {
   if (loading) return <><Navbar /><div className="spinner-wrap"><div className="spinner"/></div></>;
   if (error)   return <><Navbar /><div className="container" style={{paddingTop:40}}><div className="alert alert-error">{error}</div></div></>;
 
-  const handleExportCSV = () => window.open(`${SERVER}/api/export/${examId}/csv`, '_blank');
-  const handleExportPDF = () => window.open(`${SERVER}/api/export/${examId}/pdf`, '_blank');
+  const handleExport = async (format) => {
+    try {
+      const res = await api.get(`/export/${examId}/${format}`, { responseType: 'blob' });
+      const mimeType = format === 'pdf' ? 'application/pdf' : 'text/csv';
+      const ext = format === 'pdf' ? 'pdf' : 'csv';
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: mimeType }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${exam?.title?.replace(/\s+/g, '_') || 'Results'}_Results.${ext}`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(`Export failed: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+  const handleExportCSV = () => handleExport('csv');
+  const handleExportPDF = () => handleExport('pdf');
 
   const filtered = allStudents.filter(s => {
     if (filter === 'submitted')     return s.hasSubmitted;
@@ -240,14 +250,16 @@ export default function ExamResults() {
                           {/* Sheet link */}
                           <td style={{ padding:'14px 24px' }}>
                             {fileUrl ? (
-                              <a
-                                href={getPdfViewerUrl(fileUrl)}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ color:'var(--accent)', textDecoration:'underline', fontSize:'.85rem' }}
+                              <button
+                                onClick={() => {
+                                  const sid = evalData?.submissionId;
+                                  if (sid) openPdf(`/files/answer-sheet/${sid}`, (v) => setPdfLoading(p => ({ ...p, [sid]: v })));
+                                }}
+                                disabled={!evalData?.submissionId || pdfLoading[evalData?.submissionId]}
+                                style={{ color:'var(--accent)', textDecoration:'underline', fontSize:'.85rem', background:'none', border:'none', cursor:'pointer', padding:0 }}
                               >
-                                View PDF
-                              </a>
+                                {pdfLoading[evalData?.submissionId] ? '⏳...' : 'View PDF'}
+                              </button>
                             ) : (
                               <span style={{ color:'var(--text-3)', fontSize:'.85rem' }}>—</span>
                             )}
