@@ -5,6 +5,13 @@ import api from '../api/axios';
 
 const SERVER = 'https://easeexam-backend.onrender.com';
 
+/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
+const getPdfViewerUrl = (url) => {
+  if (!url) return '';
+  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
+};
+
 const STATUS_CONFIG = {
   not_submitted: { bg: 'rgba(107,114,128,0.12)', color: '#9ca3af', label: 'NOT SUBMITTED' },
   pending:       { bg: 'rgba(251,191,36,0.15)',  color: 'var(--yellow)', label: 'PENDING' },
@@ -234,7 +241,7 @@ export default function ExamResults() {
                           <td style={{ padding:'14px 24px' }}>
                             {fileUrl ? (
                               <a
-                                href={fileUrl.startsWith('http') ? fileUrl : `${SERVER}${fileUrl}`}
+                                href={getPdfViewerUrl(fileUrl)}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{ color:'var(--accent)', textDecoration:'underline', fontSize:'.85rem' }}

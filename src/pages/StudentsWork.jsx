@@ -5,6 +5,13 @@ import api from '../api/axios';
 
 const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
 
+/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
+const getPdfViewerUrl = (url) => {
+  if (!url) return '';
+  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
+};
+
 export default function StudentsWork() {
   const { examId } = useParams();
   const [data, setData] = useState(null);
@@ -120,7 +127,7 @@ export default function StudentsWork() {
                       <td style={{ padding: '16px 24px' }}>
                         {item.hasSubmitted ? (
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <a href={item.fileUrl.startsWith('http') ? item.fileUrl : `${SERVER}${item.fileUrl}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
+                            <a href={getPdfViewerUrl(item.fileUrl)} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '.75rem' }}>
                               View Sheet
                             </a>
                             {item.status === 'evaluated' && (

@@ -6,6 +6,13 @@ import { useAuth } from '../context/AuthContext';
 
 const SERVER = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://easeexam-backend.onrender.com';
 
+/** Wraps any public URL in Google Docs Viewer so PDFs open inline in the browser */
+const getPdfViewerUrl = (url) => {
+  if (!url) return '';
+  const fullUrl = url.startsWith('http') ? url : `${SERVER}/${url.replace(/^\//, '')}`;
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`;
+};
+
 export default function StudentDashboard() {
   const { user } = useAuth();
   const [exams, setExams] = useState([]);
@@ -123,7 +130,7 @@ export default function StudentDashboard() {
                       <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                         {exam.questionPaperUrl && (
                           <a
-                            href={exam.questionPaperUrl.startsWith('http') ? exam.questionPaperUrl : `${SERVER}${exam.questionPaperUrl.startsWith('/') ? '' : '/'}${exam.questionPaperUrl.replace(/\\/g, '/')}`}
+                            href={getPdfViewerUrl(exam.questionPaperUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-ghost btn-sm"
